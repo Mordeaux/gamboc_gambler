@@ -1,31 +1,46 @@
 "use client";
 import React, { useState } from "react";
+import BetSelector from "./BetSelector";
 
-export default function Bet() {
-  const [bet, setBet] = useState(0);
+export default function Bet({ balance }: { balance: number }) {
+  const [betAmount, setBetAmount] = useState(1);
+  const [betValue, setBetValue] = useState(0);
+
+  const submitBet = () => {
+    console.log("betAmount", betAmount);
+    console.log("betValue", betValue);
+  };
+
   return (
     <div>
-      <h1>Bet</h1>
       <div>
         <input
           type="number"
           placeholder="Bet amount"
-          value={bet}
+          value={betAmount}
           min={1}
+          max={balance}
           onChange={(e) => {
-            console.log("running");
-            setBet(parseInt(e.target.value));
+            const value = parseInt(e.target.value);
+            if (!isNaN(value)) {
+              setBetAmount(parseInt(e.target.value));
+            } else {
+              console.error(`Invalid bet amount ${value}`);
+              setBetAmount(betAmount);
+            }
           }}
         />
         <div>
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-          <span>4</span>
-          <span>5</span>
-          <span>6</span>
+          {Array.from({ length: 6 }, (_, i) => (
+            <BetSelector dieSide={i + 1} key={i} setBetValue={setBetValue} />
+          ))}
         </div>
-        <input type="submit" value="Bet" />
+        <input
+          type="submit"
+          value="Bet"
+          onClick={submitBet}
+          disabled={betValue == 0}
+        />
       </div>
     </div>
   );
