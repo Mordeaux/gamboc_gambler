@@ -1,25 +1,24 @@
 "use client";
 import React, { useState } from "react";
 import BetSelector from "./BetSelector";
+import { MoveType } from "../_game";
 
 export default function Bet({ balance }: { balance: number }) {
   const [betAmount, setBetAmount] = useState(1);
   const [betValue, setBetValue] = useState(0);
+  const [currentBalance, setCurrentBalance] = useState(balance);
 
   const submitBet = () => {
-    console.log("betAmount", betAmount);
-    console.log("betValue", betValue);
-
     fetch("/api/play", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ betAmount, betValue }),
+      body: JSON.stringify({ moveType: MoveType.Bet, betAmount, betValue }),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
+        setCurrentBalance(data.newGameState.balance);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -28,13 +27,14 @@ export default function Bet({ balance }: { balance: number }) {
 
   return (
     <div>
+      <div>Balance: {currentBalance}</div>
       <div>
         <input
           type="number"
           placeholder="Bet amount"
           value={betAmount}
           min={1}
-          max={balance}
+          max={currentBalance}
           onChange={(e) => {
             const value = parseInt(e.target.value);
             if (!isNaN(value)) {
