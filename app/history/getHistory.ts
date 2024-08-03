@@ -1,12 +1,8 @@
-import { GameState, PrismaClient } from "@prisma/client";
-import MoveType from "../_game/MoveType";
-const prisma = new PrismaClient();
+import { PrismaClient } from "@prisma/client";
+import MoveType from "@/app/_game/MoveType";
+import GameHistoryType from "@/app/history/GameHistoryType";
 
-export type GameHistoryType = GameState & {
-  betAmount?: number;
-  betValue?: number;
-  rollValue?: number;
-};
+const prisma = new PrismaClient();
 
 export const getHistory = async (playerId: string) => {
   const history = await prisma.gameState.findMany({

@@ -74,7 +74,6 @@ export default function Bet({
         <input
           type="number"
           placeholder="Bet amount"
-          value={betAmount}
           min={1}
           max={currentBalance}
           onChange={(e) => {
@@ -106,7 +105,7 @@ export default function Bet({
         <div>
           <input
             type="submit"
-            value="Bet"
+            defaultValue="Bet"
             onClick={submitBet}
             disabled={betValue == 0 || awaitingResponse}
           />
@@ -114,7 +113,7 @@ export default function Bet({
         <div>
           <input
             type="Withdraw"
-            value="Withdraw"
+            defaultValue="Withdraw"
             onClick={withdraw}
             disabled={awaitingResponse}
           />
