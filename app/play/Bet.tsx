@@ -16,10 +16,12 @@ export default function Bet({
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [displayHistory, setDisplayHistory] = useState(false);
   const [lastRolledValue, setLastRolledValue] = useState(rolledValue);
+  const [lastBetValue, setLastBetValue] = useState(0);
 
   const withdraw = () => {
     setAwaitingResponse(true);
     setDisplayHistory(false);
+    setLastBetValue(0);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -42,6 +44,7 @@ export default function Bet({
 
   const submitBet = () => {
     setAwaitingResponse(true);
+    setLastBetValue(betValue);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -97,7 +100,7 @@ export default function Bet({
         <div>{awaitingResponse ? "Rolling Dice" : ""}</div>
         <div>
           {displayHistory && lastRolledValue
-            ? `You rolled a ${lastRolledValue}`
+            ? `You rolled a ${lastRolledValue}, ${lastRolledValue === lastBetValue ? "You win!" : "You lose!"}`
             : ""}
         </div>
         <div>
