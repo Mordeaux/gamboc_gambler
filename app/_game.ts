@@ -75,7 +75,7 @@ export const placeBet = async (
     balance = balance - amount;
   }
 
-  return prisma.gameState.create({
+  await prisma.gameState.create({
     data: {
       balance,
       moveType: MoveType.Bet,
@@ -86,4 +86,11 @@ export const placeBet = async (
     },
     include: { bet: true },
   });
+  let newState = await getLatestGameState(currentPlayer.id);
+  if (newState.balance == 0) {
+    await processMove(currentPlayer, MoveType.Bankruptcy);
+    return getLatestGameState(currentPlayer.id);
+  } else {
+    return newState;
+  }
 };

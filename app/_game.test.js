@@ -9,12 +9,20 @@ import { processMove } from "../app/_game";
 const prisma = new PrismaClient();
 
 describe("_game", () => {
+  beforeAll(async () => {
+    await prisma.gameState.deleteMany();
+  });
+
   beforeEach(async () => {
     await seed();
   });
 
   afterEach(async () => {
     await prisma.gameState.deleteMany();
+  });
+
+  afterAll(async () => {
+    await seed();
   });
 
   it.each([
@@ -36,6 +44,13 @@ describe("_game", () => {
       expect(gameState.moveType).toBe(MoveType.Bet);
     },
   );
+
+  it("should bankrupt the player if they are out of funds", async () => {
+    const currentPlayer = await getCurrentPlayer();
+    const gameState = await placeBet(currentPlayer, 1000, 6, 3);
+    expect(gameState.balance).toBe(startingBalance);
+    expect(gameState.moveType).toBe(MoveType.Bankruptcy);
+  });
 
   it.each([
     [MoveType.Bankruptcy, startingBalance],
