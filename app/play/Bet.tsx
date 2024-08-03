@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import BetSelector from "./BetSelector";
-import { MoveType } from "../_game";
+import MoveType from "@/app/_game/MoveType";
 
 export default function Bet({ balance }: { balance: number }) {
   const [betAmount, setBetAmount] = useState(1);

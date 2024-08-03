@@ -19,17 +19,17 @@ model User {
 
 model Bet {
   id          String    @id @default(cuid())
-  betAmount   Int
-  betValue    Int
+  amount      Int
+  value       Int
   rolledValue Int
-  gameState   GameState @relation(fields: [gameStateId], references: [id])
+  gameState   GameState @relation(fields: [gameStateId], references: [id], onDelete: Cascade)
   gameStateId String    @unique
 }
 
 model GameState {
   id         String   @id @default(cuid())
   createdAt  DateTime @default(now())
-  player     User     @relation(fields: [playerId], references: [id])
+  player     User     @relation(fields: [playerId], references: [id], onDelete: Cascade)
   playerId   String
   balance    Int
   moveType   String

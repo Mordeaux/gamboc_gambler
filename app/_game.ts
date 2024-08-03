@@ -1,77 +1,88 @@
-import { Prisma, GameState, Bet, PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
+import MoveType from "@/app/_game/MoveType";
+import { startingBalance } from "@/app/config";
 
 const prisma = new PrismaClient();
-
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
-type BetWithRolledValueOptional = Optional<Bet, "rolledValue">;
-type BetPartial = Pick<
-  BetWithRolledValueOptional,
-  "betAmount" | "betValue" | "rolledValue"
->;
 
 const rollDie = (numberOfSides: number = 6) => {
   return Math.floor(Math.random() * numberOfSides) + 1;
 };
 
-export const getLatestGameState = async (playerId: string) => {
-  const gameStates = await prisma.gameState.findFirstOrThrow({
+export const getCurrentPlayer = async () =>
+  prisma.user.findFirstOrThrow({
+    where: { name: "Alice" },
+  });
+
+export const getLatestGameState = async (playerId: string) =>
+  prisma.gameState.findFirstOrThrow({
     where: { playerId },
     orderBy: { createdAt: "desc" },
     take: 1,
   });
-  return gameStates;
-};
 
-export enum MoveType {
-  StartGame = "StartGame",
-  Bet = "Bet",
-  Bankruptcy = "Bankruptcy",
-  Withdrawal = "Withdrawal",
-}
-
-export const createNextGameState = async (
-  currentState: GameState,
+export const processMove = async (
+  currentPlayer: User,
   moveType: MoveType,
-  bet: BetPartial | null = null,
+  betAmount?: number,
+  betValue?: number,
 ) => {
-  let balance = currentState.balance;
-
+  let gameState = null;
   switch (moveType) {
     case MoveType.Bet:
-      if (!bet) {
+      if (!betAmount || !betValue) {
         throw new Error("Bet must be provided when moveType is Bet");
-      } else if (bet.betAmount > balance) {
-        throw new Error("Bet amount is greater than balance");
       }
-      bet.rolledValue = rollDie();
-
-      if (bet.betValue == bet.rolledValue) {
-        balance = balance + bet.betAmount * 5;
-      } else {
-        balance = balance - bet.betAmount;
-      }
+      gameState = placeBet(currentPlayer, betAmount, betValue, rollDie());
       break;
     case MoveType.StartGame:
     case MoveType.Bankruptcy:
     case MoveType.Withdrawal:
-      if (bet) {
+      if (betAmount || betValue) {
         throw new Error("Bet must not be provided when moveType is not Bet");
       }
-      balance = 1000;
+      gameState = resetGameState(currentPlayer, moveType);
       break;
     default:
       throw new Error("Invalid moveType");
   }
+  return gameState;
+};
 
-  return await prisma.gameState.create({
+const resetGameState = async (currentPlayer: User, moveType: MoveType) =>
+  prisma.gameState.create({
+    data: {
+      balance: startingBalance,
+      moveType,
+      playerId: currentPlayer.id,
+    },
+  });
+
+export const placeBet = async (
+  currentPlayer: User,
+  amount: number,
+  value: number,
+  rolledValue: number,
+) => {
+  const currentState = await getLatestGameState(currentPlayer.id);
+  let balance = currentState.balance;
+  if (amount > balance) {
+    throw new Error("Bet amount is greater than balance");
+  }
+
+  if (value == rolledValue) {
+    balance = balance + amount * 5;
+  } else {
+    balance = balance - amount;
+  }
+
+  return prisma.gameState.create({
     data: {
       balance,
-      moveType,
+      moveType: MoveType.Bet,
       playerId: currentState.playerId,
-      // Normal bounds checking didn't work for rolledValue for some reason
-      bet: bet
-        ? { create: { ...bet, rolledValue: bet.rolledValue || 0 } }
-        : undefined,
+      bet: {
+        create: { amount, value, rolledValue },
+      },
     },
     include: { bet: true },
   });
