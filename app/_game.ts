@@ -86,6 +86,7 @@ export const placeBet = async (
     },
     include: { bet: true },
   });
+
   let newState = await getLatestGameState(currentPlayer.id);
   if (newState.balance == 0) {
     await processMove(currentPlayer, MoveType.Bankruptcy);

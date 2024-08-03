@@ -45,9 +45,14 @@ export default function Bet({ balance }: { balance: number }) {
             }
           }}
         />
-        <div>
+        <div className="flex">
           {Array.from({ length: 6 }, (_, i) => (
-            <BetSelector dieSide={i + 1} key={i} setBetValue={setBetValue} />
+            <BetSelector
+              dieSide={i + 1}
+              key={i}
+              setBetValue={setBetValue}
+              betValue={betValue}
+            />
           ))}
         </div>
         <input

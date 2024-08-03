@@ -13,7 +13,7 @@ export default async function Game() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div>
-        <h1>Game</h1>
+        <h1 className="text-3xl font-bold underline">Game</h1>
         <Bet balance={balance} />
       </div>
     </main>
