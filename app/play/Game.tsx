@@ -1,13 +1,10 @@
-import { PrismaClient } from "@prisma/client";
-import { getLatestGameState } from "../_game";
+import { getCurrentPlayer, getLatestGameState } from "../_game";
 import Bet from "./Bet";
-
-const prisma = new PrismaClient();
+import Link from "next/link";
 
 export default async function Game() {
-  const alice = await prisma.user.findFirstOrThrow({
-    where: { name: "Alice" },
-  });
+  const alice = await getCurrentPlayer();
+
   const currentGameState = await getLatestGameState(alice.id);
   const balance = currentGameState.balance;
   return (
@@ -15,6 +12,9 @@ export default async function Game() {
       <div>
         <h1 className="text-3xl font-bold underline">Game</h1>
         <Bet balance={balance} />
+        <h1 className="text-3xl font-bold underline">
+          <Link href="history">See History</Link>
+        </h1>
       </div>
     </main>
   );
