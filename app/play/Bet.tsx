@@ -7,8 +7,10 @@ export default function Bet({ balance }: { balance: number }) {
   const [betAmount, setBetAmount] = useState(1);
   const [betValue, setBetValue] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(balance);
+  const [awaitingResponse, setAwaitingResponse] = useState(false);
 
   const withdraw = () => {
+    setAwaitingResponse(true);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -19,15 +21,17 @@ export default function Bet({ balance }: { balance: number }) {
       .then((response) => response.json())
       .then((data) => {
         setCurrentBalance(data.newGameState.balance);
+        setBetValue(0);
+        setBetAmount(1);
+        setAwaitingResponse(false);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-    setBetValue(0);
-    setBetAmount(1);
   };
 
   const submitBet = () => {
+    setAwaitingResponse(true);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -38,6 +42,7 @@ export default function Bet({ balance }: { balance: number }) {
       .then((response) => response.json())
       .then((data) => {
         setCurrentBalance(data.newGameState.balance);
+        setAwaitingResponse(false);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -79,11 +84,16 @@ export default function Bet({ balance }: { balance: number }) {
             type="submit"
             value="Bet"
             onClick={submitBet}
-            disabled={betValue == 0}
+            disabled={betValue == 0 || awaitingResponse}
           />
         </div>
         <div>
-          <input type="Withdraw" value="Withdraw" onClick={withdraw} />
+          <input
+            type="Withdraw"
+            value="Withdraw"
+            onClick={withdraw}
+            disabled={awaitingResponse}
+          />
         </div>
       </div>
     </div>

@@ -4,7 +4,12 @@ import { startingBalance } from "@/app/config";
 
 const prisma = new PrismaClient();
 
-const rollDie = (numberOfSides: number = 6) => {
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const rollDie = async (numberOfSides: number = 6) => {
+  await sleep(3000);
   return Math.floor(Math.random() * numberOfSides) + 1;
 };
 
@@ -32,7 +37,7 @@ export const processMove = async (
       if (!betAmount || !betValue) {
         throw new Error("Bet must be provided when moveType is Bet");
       }
-      gameState = placeBet(currentPlayer, betAmount, betValue, rollDie());
+      gameState = placeBet(currentPlayer, betAmount, betValue, await rollDie());
       break;
     case MoveType.Withdrawal:
       const gameStateCount = await prisma.gameState.count({
