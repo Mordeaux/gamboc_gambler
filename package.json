@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run migrate && npm run seed && next dev",
+    "dev": "npm run migrate-seed && next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npm run migrate-seed && next build && next start",
     "lint": "next lint",
     "seed": "prisma db seed",
     "migrate": "prisma db push",
+    "migrate-seed": "npm run migrate && npm run seed",
     "test": "jest"
   },
   "prisma": {

@@ -2,7 +2,7 @@ import { GameState, PrismaClient } from "@prisma/client";
 import MoveType from "../_game/MoveType";
 const prisma = new PrismaClient();
 
-export type GameHistory = GameState & {
+export type GameHistoryType = GameState & {
   betAmount?: number;
   betValue?: number;
   rollValue?: number;
@@ -15,7 +15,7 @@ export const getHistory = async (playerId: string) => {
     include: { bet: true },
   });
 
-  const chunkedHistory: GameHistory[][] = [[]];
+  const chunkedHistory: GameHistoryType[][] = [[]];
   history.map((gameState) => {
     const gameIndex = chunkedHistory.length - 1;
     if (

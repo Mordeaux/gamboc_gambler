@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getCurrentPlayer } from "../_game";
-import { GameHistory, getHistory } from "./getHistory";
+import { GameHistoryType, getHistory } from "./getHistory";
 import MoveType from "../_game/MoveType";
 
 enum DieColor {
@@ -17,13 +17,13 @@ const Die = ({ dieSide, color }: { dieSide: number; color: DieColor }) => (
   />
 );
 
-const GameHistory = ({ game }: { game: GameHistory[] }) => {
+const GameHistory = ({ game }: { game: GameHistoryType[] }) => {
   let previousBalance;
-  const children = game.map((gameState) => {
+  const children = game.map((gameState, i) => {
     if (gameState.moveType === MoveType.Withdrawal) {
-      return <p>You withdrew: {previousBalance!}</p>;
+      return <p key={i}>You withdrew: {previousBalance!}</p>;
     } else if (gameState.moveType === MoveType.Bankruptcy) {
-      return <p>You went bankrupt. Please seek help</p>;
+      return <p key={i}>You went bankrupt. Please seek help</p>;
     } else if (
       gameState.betAmount &&
       gameState.betValue &&
@@ -32,7 +32,7 @@ const GameHistory = ({ game }: { game: GameHistory[] }) => {
       previousBalance = gameState.balance;
 
       return (
-        <div>
+        <div key={i}>
           <p>
             You bet {gameState.betAmount} chip
             {gameState.betAmount > 1 ? "s" : ""} on:{" "}
@@ -59,9 +59,9 @@ export default async function History() {
     <div>
       {history.map((game, i) => {
         return (
-          <div>
+          <div key={i}>
             <h1>Game {i + 1}:</h1>
-            <GameHistory key={i} game={game} />
+            <GameHistory game={game} />
           </div>
         );
       })}

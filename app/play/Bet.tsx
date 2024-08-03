@@ -15,6 +15,7 @@ export default function Bet({
   const [currentBalance, setCurrentBalance] = useState(balance);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [displayHistory, setDisplayHistory] = useState(false);
+  const [lastRolledValue, setLastRolledValue] = useState(rolledValue);
 
   const withdraw = () => {
     setAwaitingResponse(true);
@@ -32,6 +33,7 @@ export default function Bet({
         setBetValue(0);
         setBetAmount(1);
         setAwaitingResponse(false);
+        setLastRolledValue(0);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -52,6 +54,7 @@ export default function Bet({
         setCurrentBalance(data.newGameState.balance);
         setAwaitingResponse(false);
         setDisplayHistory(true);
+        setLastRolledValue(data.newGameState.bet.rolledValue);
         setTimeout(() => {
           setDisplayHistory(false);
         }, 3000);
@@ -93,7 +96,9 @@ export default function Bet({
         </div>
         <div>{awaitingResponse ? "Rolling Dice" : ""}</div>
         <div>
-          {displayHistory && rolledValue ? `You rolled a ${rolledValue}` : ""}
+          {displayHistory && lastRolledValue
+            ? `You rolled a ${lastRolledValue}`
+            : ""}
         </div>
         <div>
           <input
