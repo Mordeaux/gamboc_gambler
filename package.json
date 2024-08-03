@@ -10,7 +10,7 @@
     "seed": "prisma db seed",
     "migrate": "prisma db push",
     "migrate-seed": "npm run migrate && npm run seed",
-    "test": "jest"
+    "test": "DATABASE_URL=\"file:./gambler-test.db\" npm run migrate-seed && jest"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
