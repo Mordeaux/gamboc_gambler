@@ -3,14 +3,22 @@ import React, { useState } from "react";
 import BetSelector from "./BetSelector";
 import MoveType from "@/app/_game/MoveType";
 
-export default function Bet({ balance }: { balance: number }) {
+export default function Bet({
+  balance,
+  rolledValue,
+}: {
+  balance: number;
+  rolledValue: number;
+}) {
   const [betAmount, setBetAmount] = useState(1);
   const [betValue, setBetValue] = useState(0);
   const [currentBalance, setCurrentBalance] = useState(balance);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
+  const [displayHistory, setDisplayHistory] = useState(false);
 
   const withdraw = () => {
     setAwaitingResponse(true);
+    setDisplayHistory(false);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -43,6 +51,10 @@ export default function Bet({ balance }: { balance: number }) {
       .then((data) => {
         setCurrentBalance(data.newGameState.balance);
         setAwaitingResponse(false);
+        setDisplayHistory(true);
+        setTimeout(() => {
+          setDisplayHistory(false);
+        }, 3000);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -78,6 +90,10 @@ export default function Bet({ balance }: { balance: number }) {
               betValue={betValue}
             />
           ))}
+        </div>
+        <div>{awaitingResponse ? "Rolling Dice" : ""}</div>
+        <div>
+          {displayHistory && rolledValue ? `You rolled a ${rolledValue}` : ""}
         </div>
         <div>
           <input

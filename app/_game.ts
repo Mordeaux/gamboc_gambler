@@ -22,6 +22,9 @@ export const getLatestGameState = async (playerId: string) =>
   prisma.gameState.findFirstOrThrow({
     where: { playerId },
     orderBy: { createdAt: "desc" },
+    include: {
+      bet: true,
+    },
     take: 1,
   });
 
