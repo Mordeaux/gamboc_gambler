@@ -97,7 +97,7 @@ export default function Bet({
             />
           ))}
         </div>
-        <div>{awaitingResponse ? "Rolling Dice" : ""}</div>
+        <div>{awaitingResponse ? "Rolling Die" : ""}</div>
         <div>
           {displayHistory && lastRolledValue
             ? `You rolled a ${lastRolledValue}, ${lastRolledValue === lastBetValue ? "You win!" : "You lose!"}`
