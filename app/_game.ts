@@ -34,9 +34,16 @@ export const processMove = async (
       }
       gameState = placeBet(currentPlayer, betAmount, betValue, rollDie());
       break;
+    case MoveType.Withdrawal:
+      const gameStateCount = await prisma.gameState.count({
+        where: { playerId: currentPlayer.id },
+      });
+      if (gameStateCount < 2) {
+        gameState = getLatestGameState(currentPlayer.id);
+        break;
+      }
     case MoveType.StartGame:
     case MoveType.Bankruptcy:
-    case MoveType.Withdrawal:
       if (betAmount || betValue) {
         throw new Error("Bet must not be provided when moveType is not Bet");
       }

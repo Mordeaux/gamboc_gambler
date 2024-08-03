@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { getCurrentPlayer, placeBet } from "./_game";
+import { getCurrentPlayer, getLatestGameState, placeBet } from "./_game";
 import MoveType from "@/app/_game/MoveType";
 import { PrismaClient } from "@prisma/client";
 import { startingBalance } from "@/app/config";
@@ -52,13 +52,30 @@ describe("_game", () => {
     expect(gameState.moveType).toBe(MoveType.Bankruptcy);
   });
 
-  it.each([
-    [MoveType.Bankruptcy, startingBalance],
-    [MoveType.Withdrawal, startingBalance],
-  ])("Should restart", async (moveType, expectedBalance) => {
+  it("should withdraw if the player has bet once", async () => {
     const currentPlayer = await getCurrentPlayer();
-    const gameState = await processMove(currentPlayer, moveType);
-    expect(gameState.balance).toBe(expectedBalance);
-    expect(gameState.moveType).toBe(moveType);
+    await placeBet(currentPlayer, 100, 6, 3);
+    const gameState = await processMove(currentPlayer, MoveType.Withdrawal);
+
+    expect(gameState.balance).toBe(startingBalance);
+    expect(gameState.moveType).toBe(MoveType.Withdrawal);
   });
+
+  it("should NOT withdraw if the player has NOT bet", async () => {
+    const currentPlayer = await getCurrentPlayer();
+    const gameState = await processMove(currentPlayer, MoveType.Withdrawal);
+
+    expect(gameState.balance).toBe(startingBalance);
+    expect(gameState.moveType).toBe(MoveType.StartGame);
+  });
+
+  it.each([[MoveType.Bankruptcy, startingBalance]])(
+    "Should restart",
+    async (moveType, expectedBalance) => {
+      const currentPlayer = await getCurrentPlayer();
+      const gameState = await processMove(currentPlayer, moveType);
+      expect(gameState.balance).toBe(expectedBalance);
+      expect(gameState.moveType).toBe(moveType);
+    },
+  );
 });
