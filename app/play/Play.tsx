@@ -73,7 +73,11 @@ export default function Play() {
       .then((data) => {
         setAwaitingResponse(false);
         setDisplayHistory(true);
-        setLastRolledValue(data.newGameState.bet.rolledValue);
+        setLastRolledValue(
+          data.newGameState.bet?.rolledValue ||
+            history.slice(-2)[0]?.slice(-2)[0]?.betValue ||
+            0,
+        );
         setGameState(data.newGameState);
         setTimeout(() => {
           setDisplayHistory(false);
@@ -88,7 +92,7 @@ export default function Play() {
   return (
     <>
       <h2 className="text-xl font-bold text-center m-2">
-        Balance: {gameState?.balance}:
+        Balance: {gameState?.balance}
       </h2>
 
       <Bet
