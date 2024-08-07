@@ -43,10 +43,8 @@ export const processMove = async (
       gameState = placeBet(currentPlayer, betAmount, betValue, await rollDie());
       break;
     case MoveType.Withdrawal:
-      const gameStateCount = await prisma.gameState.count({
-        where: { playerId: currentPlayer.id },
-      });
-      if (gameStateCount < 2) {
+      const latestGameState = await getLatestGameState(currentPlayer.id);
+      if (latestGameState.moveType !== MoveType.Bet) {
         gameState = getLatestGameState(currentPlayer.id);
         break;
       }

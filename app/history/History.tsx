@@ -1,8 +1,5 @@
 "use client";
-import GameHistoryType from "@/app/history/GameHistoryType";
-import { useEffect, useState } from "react";
-import { HistoryContext } from "./HistoryContext";
-import { useGameState } from "../_game/GameStateContext";
+import { HistoryContext, useHistory } from "./HistoryContext";
 import { startingBalance } from "../config";
 import BetHistory from "@/app/history/BetHistory";
 
@@ -13,16 +10,7 @@ const GameHistoryBorder = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function History() {
-  const [history, setHistory] = useState<GameHistoryType[][]>([]);
-  const { gameState } = useGameState();
-
-  useEffect(() => {
-    fetch("api/history")
-      .then((resp) => resp.json())
-      .then(({ history }) => {
-        setHistory(history);
-      });
-  }, [gameState]);
+  const history = useHistory();
 
   return (
     <HistoryContext.Provider value={history}>
