@@ -19,3 +19,5 @@ export async function POST(request: Request) {
   );
   return NextResponse.json({ ...data, newGameState }, { status: 200 });
 }
+
+export const revalidate = 0;

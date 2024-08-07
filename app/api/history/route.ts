@@ -7,3 +7,5 @@ export async function GET() {
   const history = await getHistory(currentPlayer.id);
   return NextResponse.json({ history });
 }
+
+export const revalidate = 0;
