@@ -18,7 +18,7 @@ const Bet = ({
         <input
           type="number"
           name="betAmount"
-          placeholder="Bet amount"
+          placeholder="1"
           min={1}
           max={balance}
           onChange={(e) => {

@@ -5,24 +5,30 @@ import MoveType from "@/app/_game/MoveType";
 import { useGameState } from "@/app/_game/GameStateContext";
 import Bet from "./Bet";
 import { useHistory } from "../history/HistoryContext";
+import Die, { DieColor } from "../history/Die";
+
+const RollingDie = () => {
+  const [side, setSide] = useState(1);
+  setInterval(() => {
+    setSide((side) => (side % 6) + 1);
+  }, 100);
+  return <Die dieSide={side} color={DieColor.Black} />;
+};
 
 export default function Play() {
   const { gameState, setGameState } = useGameState();
   const history = useHistory();
+
   const [betAmount, setBetAmount] = useState(gameState?.betAmount || 1);
   const [betValue, setBetValue] = useState(gameState?.betValue || 0);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [displayHistory, setDisplayHistory] = useState(false);
-  const [lastRolledValue, setLastRolledValue] = useState(
-    gameState?.rollValue || 0,
-  );
-  const [lastBetValue, setLastBetValue] = useState(0);
+  const lastBet = history.slice(-1)[0]?.slice(-1)[0];
   const hasPreviouslyBet = history.slice(-1)[0]?.length > 0;
 
   const withdraw = () => {
     setAwaitingResponse(true);
     setDisplayHistory(false);
-    setLastBetValue(0);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -35,7 +41,6 @@ export default function Play() {
         setBetValue(0);
         setBetAmount(1);
         setAwaitingResponse(false);
-        setLastRolledValue(0);
         setGameState(data.newGameState);
       })
       .catch((error) => {
@@ -45,7 +50,6 @@ export default function Play() {
 
   const submitBet = () => {
     setAwaitingResponse(true);
-    setLastBetValue(betValue);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -57,7 +61,6 @@ export default function Play() {
       .then((data) => {
         setAwaitingResponse(false);
         setDisplayHistory(true);
-        setLastRolledValue(data.newGameState.bet.rolledValue);
         setGameState(data.newGameState);
         setTimeout(() => {
           setDisplayHistory(false);
@@ -90,31 +93,40 @@ export default function Play() {
           />
         ))}
       </div>
-      <div>{awaitingResponse ? "Rolling Die" : ""}</div>
-      <div>
-        {displayHistory && lastRolledValue
-          ? `You rolled a ${lastRolledValue}, ${lastRolledValue === lastBetValue ? "You win!" : "You lose!"}`
-          : ""}
-      </div>
       <div className="flex">
-        <button
-          className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
-          onClick={submitBet}
-          disabled={
-            betValue == 0 ||
-            awaitingResponse ||
-            !!(gameState?.balance && betAmount > gameState?.balance)
-          }
-        >
-          Place Bet
-        </button>
-        <button
-          className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
-          onClick={withdraw}
-          disabled={awaitingResponse || !hasPreviouslyBet}
-        >
-          Withdraw Balance
-        </button>
+        <div className="flex">
+          <button
+            className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
+            onClick={submitBet}
+            disabled={
+              betValue == 0 ||
+              awaitingResponse ||
+              !!(gameState?.balance && betAmount > gameState?.balance)
+            }
+          >
+            Place Bet
+          </button>
+          <button
+            className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
+            onClick={withdraw}
+            disabled={awaitingResponse || !hasPreviouslyBet}
+          >
+            Withdraw Balance
+          </button>
+        </div>
+        <div className="m-auto">
+          {awaitingResponse ? <RollingDie /> : ""}
+          {displayHistory && lastBet.rollValue ? (
+            <>
+              <Die dieSide={lastBet.rollValue} color={DieColor.Black} />
+              {lastBet.rollValue === lastBet.betValue
+                ? "You win!"
+                : "You lose!"}
+            </>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     </>
   );
