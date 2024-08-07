@@ -98,7 +98,7 @@ export default function Play() {
       </div>
       <div className="flex">
         <button
-          className="bg-c1 font-semibold py-2 px-4 border border-c2 rounded m-10"
+          className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
           onClick={submitBet}
           disabled={
             betValue == 0 ||
@@ -109,7 +109,7 @@ export default function Play() {
           Place Bet
         </button>
         <button
-          className="bg-c1 font-semibold py-2 px-4 border border-c2 rounded m-10"
+          className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
           onClick={withdraw}
           disabled={awaitingResponse || !hasPreviouslyBet}
         >

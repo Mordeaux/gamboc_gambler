@@ -35,7 +35,7 @@ export default function Home() {
             <h1 className="text-3xl font-bold text-center">Gamboc Gambler</h1>
             <Play />
             <button
-              className="bg-c1 font-semibold py-2 px-4 border border-c2 rounded m-10"
+              className="bg-c2 font-semibold py-2 px-4 border border-c2 rounded m-10"
               onClick={() => setDisplayHistory(!displayHistory)}
             >
               {displayHistory ? "Hide" : "See"} History
