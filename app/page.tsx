@@ -35,7 +35,8 @@ export default function Home() {
           </button>
         </div>
         {displayHistory && (
-          <div className="border-solid border-8 border-c4/60 rounded-2xl w-full p-10 bg-c3 m-2">
+          <div className="border-solid border-8 border-c4/60 rounded-2xl w-full p-10 bg-c3 m-2 min-h-screen">
+            <h1 className="text-3xl font-bold text-center">History</h1>
             <History />
           </div>
         )}
