@@ -72,13 +72,18 @@ export default function Play() {
     })
       .then((response) => response.json())
       .then((data) => {
+        let lastRoll;
+        if (data.newGameState.moveType === MoveType.Bankruptcy) {
+          lastRoll = history.slice(-1)[0]?.slice(-2)[0]?.rollValue || 0;
+        } else {
+          lastRoll =
+            data.newGameState.bet?.rolledValue ||
+            history.slice(-2)[0]?.slice(-2)[0]?.rollValue ||
+            0;
+        }
         setAwaitingResponse(false);
         setDisplayHistory(true);
-        setLastRolledValue(
-          data.newGameState.bet?.rolledValue ||
-            history.slice(-2)[0]?.slice(-2)[0]?.betValue ||
-            0,
-        );
+        setLastRolledValue(lastRoll);
         setGameState(data.newGameState);
         setTimeout(() => {
           setDisplayHistory(false);
