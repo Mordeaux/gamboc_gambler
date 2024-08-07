@@ -68,7 +68,7 @@ export default function Bet({
   };
 
   return (
-    <div>
+    <>
       <div>Balance: {currentBalance}</div>
       <div>
         <input
@@ -119,6 +119,6 @@ export default function Bet({
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }
