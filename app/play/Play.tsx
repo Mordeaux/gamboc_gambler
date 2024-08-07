@@ -6,6 +6,7 @@ import { useGameState } from "@/app/_game/GameStateContext";
 import Bet from "./Bet";
 import { useHistory } from "../history/HistoryContext";
 import Die, { DieColor } from "../history/Die";
+import { hasWon } from "../utils";
 
 const RollingDie = () => {
   const [side, setSide] = useState(1);
@@ -27,8 +28,8 @@ export default function Play() {
     gameState?.rollValue || 0,
   );
   const [lastBetValue, setLastBetValue] = useState(0);
+  const hasPreviouslyWon = hasWon(history);
 
-  const hasPreviouslyBet = history.slice(-1)[0]?.length > 0;
   const [lastBetAmount, setLastBetAmount] = useState(0);
   const potentialWinnings = lastBetAmount * 5;
 
@@ -126,7 +127,7 @@ export default function Play() {
           <button
             className="bg-c2 disabled:bg-c1 font-semibold py-2 px-4 border border-c1 rounded m-10"
             onClick={withdraw}
-            disabled={awaitingResponse || !hasPreviouslyBet}
+            disabled={awaitingResponse || !hasPreviouslyWon}
           >
             Withdraw Balance
           </button>

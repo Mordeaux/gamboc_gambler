@@ -1,3 +1,5 @@
+import GameHistoryType from "./history/GameHistoryType";
+
 export const formatDateTime = (date: Date) => {
   const getOrdinal = (n: number) => {
     const finalDigit = n % 10;
@@ -46,3 +48,9 @@ export const formatDateTime = (date: Date) => {
 
   return `On ${dayOfWeek}, the ${day}${getOrdinal(day)} of ${month}, ${year} at ${hour}:${minute}:${second}`;
 };
+
+export const hasWon = (history: GameHistoryType[][]) =>
+  history.slice(-1)[0]?.length > 0 &&
+  history
+    .slice(-1)[0]
+    ?.some((gameState) => gameState.betValue === gameState.rollValue);

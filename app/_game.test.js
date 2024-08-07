@@ -52,21 +52,40 @@ describe("_game", () => {
     expect(gameState.moveType).toBe(MoveType.Bankruptcy);
   });
 
-  it("should withdraw if the player has bet once", async () => {
+  it("should withdraw if the player has won once", async () => {
     const currentPlayer = await getCurrentPlayer();
-    await placeBet(currentPlayer, 100, 6, 3);
+    await prisma.gameState.create({
+      data: {
+        balance: 1050,
+        moveType: MoveType.Bet,
+        playerId: currentPlayer.id,
+        bet: {
+          create: { amount: 10, value: 3, rolledValue: 3 },
+        },
+      },
+    });
     const gameState = await processMove(currentPlayer, MoveType.Withdrawal);
 
-    expect(gameState.balance).toBe(startingBalance);
+    expect(gameState.balance).toBe(1000);
     expect(gameState.moveType).toBe(MoveType.Withdrawal);
   });
 
-  it("should NOT withdraw if the player has NOT bet", async () => {
+  it("should NOT withdraw if the player has NOT won", async () => {
     const currentPlayer = await getCurrentPlayer();
+    await prisma.gameState.create({
+      data: {
+        balance: startingBalance - 10,
+        moveType: MoveType.Bet,
+        playerId: currentPlayer.id,
+        bet: {
+          create: { amount: 10, value: 2, rolledValue: 3 },
+        },
+      },
+    });
     const gameState = await processMove(currentPlayer, MoveType.Withdrawal);
 
-    expect(gameState.balance).toBe(startingBalance);
-    expect(gameState.moveType).toBe(MoveType.StartGame);
+    expect(gameState.balance).toBe(startingBalance - 10);
+    expect(gameState.moveType).toBe(MoveType.Bet);
   });
 
   it.each([[MoveType.Bankruptcy, startingBalance]])(

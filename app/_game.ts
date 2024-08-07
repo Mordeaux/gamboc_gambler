@@ -1,6 +1,8 @@
 import { PrismaClient, User } from "@prisma/client";
 import MoveType from "@/app/_game/MoveType";
 import { startingBalance } from "@/app/config";
+import { getHistory } from "./history/getHistory";
+import { hasWon } from "./utils";
 
 const prisma = new PrismaClient();
 
@@ -43,8 +45,8 @@ export const processMove = async (
       gameState = placeBet(currentPlayer, betAmount, betValue, await rollDie());
       break;
     case MoveType.Withdrawal:
-      const latestGameState = await getLatestGameState(currentPlayer.id);
-      if (latestGameState.moveType !== MoveType.Bet) {
+      const history = await getHistory(currentPlayer.id);
+      if (!hasWon(history)) {
         gameState = getLatestGameState(currentPlayer.id);
         break;
       }
