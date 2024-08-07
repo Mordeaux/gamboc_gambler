@@ -9,11 +9,6 @@ enum DieColor {
   Black = "black",
 }
 
-const getHistory = async () => {
-  const response = await fetch(`api/history`);
-  return await response.json();
-};
-
 const Die = ({ dieSide, color }: { dieSide: number; color: DieColor }) => (
   <Image
     src={`${color}-dice/dice-${dieSide}-svgrepo-com.svg`}
@@ -112,9 +107,11 @@ export default function History() {
   const [history, setHistory] = useState<GameHistoryType[][]>([]);
 
   useEffect(() => {
-    getHistory().then(({ history }) => {
-      setHistory(history);
-    });
+    fetch("api/history")
+      .then((resp) => resp.json())
+      .then(({ history }) => {
+        setHistory(history);
+      });
   }, []);
 
   return (

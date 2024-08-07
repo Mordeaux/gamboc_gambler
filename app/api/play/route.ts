@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { processMove, getCurrentPlayer } from "@/app/_game";
+import { processMove, getCurrentPlayer, getLatestGameState } from "@/app/_game";
+
+export async function GET() {
+  const currentPlayer = await getCurrentPlayer();
+  const gameState = await getLatestGameState(currentPlayer.id);
+  return NextResponse.json(gameState, { status: 200 });
+}
 
 export async function POST(request: Request) {
   const data = await request.json();

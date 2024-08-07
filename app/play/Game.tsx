@@ -1,20 +1,24 @@
 "use client";
-import { getCurrentPlayer, getLatestGameState } from "../_game";
+import { useEffect, useState } from "react";
 import Bet from "./Bet";
-import GameContext from "@/app/_game/GameContext";
+import { GameStateContext } from "@/app/_game/GameStateContext";
+import GameHistoryType from "@/app/history/GameHistoryType";
 
 export default function Game() {
-  const alice = await getCurrentPlayer();
+  const [gameState, setGameState] = useState<GameHistoryType | null>(null);
 
-  const currentGameState = await getLatestGameState(alice.id);
-  const balance = currentGameState.balance;
+  useEffect(() => {
+    fetch("/api/play")
+      .then((response) => response.json())
+      .then((data) => {
+        setGameState(data);
+      });
+  }, []);
+
   return (
-    <GameContext.Provider value={{}}>
+    <GameStateContext.Provider value={{ gameState, setGameState }}>
       <h1 className="text-3xl font-bold text-center">Gamboc Gambler</h1>
-      <Bet
-        balance={balance}
-        rolledValue={currentGameState.bet?.rolledValue || 0}
-      />
-    </GameContext.Provider>
+      <Bet />
+    </GameStateContext.Provider>
   );
 }

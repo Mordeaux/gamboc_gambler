@@ -1,21 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import BetSelector from "./BetSelector";
+import BetSelector from "@/app/play/BetSelector";
 import MoveType from "@/app/_game/MoveType";
+import { useGameState } from "@/app/_game/GameStateContext";
 
-export default function Bet({
-  balance,
-  rolledValue,
-}: {
-  balance: number;
-  rolledValue: number;
-}) {
-  const [betAmount, setBetAmount] = useState(1);
-  const [betValue, setBetValue] = useState(0);
-  const [currentBalance, setCurrentBalance] = useState(balance);
+export default function Bet() {
+  const { gameState, setGameState } = useGameState();
+  const [betAmount, setBetAmount] = useState(gameState?.betAmount || 1);
+  const [betValue, setBetValue] = useState(gameState?.betValue || 0);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [displayHistory, setDisplayHistory] = useState(false);
-  const [lastRolledValue, setLastRolledValue] = useState(rolledValue);
+  const [lastRolledValue, setLastRolledValue] = useState(
+    gameState?.rollValue || 0,
+  );
   const [lastBetValue, setLastBetValue] = useState(0);
 
   const withdraw = () => {
@@ -31,11 +28,11 @@ export default function Bet({
     })
       .then((response) => response.json())
       .then((data) => {
-        setCurrentBalance(data.newGameState.balance);
-        setBetValue(0);
+        setBetValue(1);
         setBetAmount(1);
         setAwaitingResponse(false);
         setLastRolledValue(0);
+        setGameState(data.newGameState);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -54,10 +51,10 @@ export default function Bet({
     })
       .then((response) => response.json())
       .then((data) => {
-        setCurrentBalance(data.newGameState.balance);
         setAwaitingResponse(false);
         setDisplayHistory(true);
         setLastRolledValue(data.newGameState.bet.rolledValue);
+        setGameState(data.newGameState);
         setTimeout(() => {
           setDisplayHistory(false);
         }, 3000);
@@ -69,13 +66,13 @@ export default function Bet({
 
   return (
     <>
-      <div>Balance: {currentBalance}</div>
+      <div>Balance: {gameState?.balance}</div>
       <div>
         <input
           type="number"
           placeholder="Bet amount"
           min={1}
-          max={currentBalance}
+          max={gameState?.balance}
           onChange={(e) => {
             const value = parseInt(e.target.value);
             if (!isNaN(value)) {
