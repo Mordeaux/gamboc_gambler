@@ -23,12 +23,21 @@ export default function Play() {
   const [betValue, setBetValue] = useState(gameState?.betValue || 0);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [displayHistory, setDisplayHistory] = useState(false);
-  const lastBet = history.slice(-1)[0]?.slice(-1)[0];
+  const [lastRolledValue, setLastRolledValue] = useState(
+    gameState?.rollValue || 0,
+  );
+  const [lastBetValue, setLastBetValue] = useState(0);
+
   const hasPreviouslyBet = history.slice(-1)[0]?.length > 0;
+  const [lastBetAmount, setLastBetAmount] = useState(0);
+  const potentialWinnings = lastBetAmount * 5;
 
   const withdraw = () => {
     setAwaitingResponse(true);
     setDisplayHistory(false);
+    setLastBetValue(0);
+    setLastBetAmount(0);
+
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -40,6 +49,7 @@ export default function Play() {
       .then((data) => {
         setBetValue(0);
         setBetAmount(1);
+        setLastRolledValue(0);
         setAwaitingResponse(false);
         setGameState(data.newGameState);
       })
@@ -50,6 +60,8 @@ export default function Play() {
 
   const submitBet = () => {
     setAwaitingResponse(true);
+    setLastBetValue(betValue);
+    setLastBetAmount(betAmount);
     fetch("/api/play", {
       method: "POST",
       headers: {
@@ -61,6 +73,7 @@ export default function Play() {
       .then((data) => {
         setAwaitingResponse(false);
         setDisplayHistory(true);
+        setLastRolledValue(data.newGameState.bet.rolledValue);
         setGameState(data.newGameState);
         setTimeout(() => {
           setDisplayHistory(false);
@@ -116,12 +129,12 @@ export default function Play() {
         </div>
         <div className="m-auto">
           {awaitingResponse ? <RollingDie /> : ""}
-          {displayHistory && lastBet.rollValue ? (
+          {displayHistory ? (
             <>
-              <Die dieSide={lastBet.rollValue} color={DieColor.Black} />
-              {lastBet.rollValue === lastBet.betValue
-                ? "You win!"
-                : "You lose!"}
+              <Die dieSide={lastRolledValue} color={DieColor.Black} />
+              {lastRolledValue === lastBetValue
+                ? `You win ${potentialWinnings} chip${potentialWinnings > 1 ? "s" : ""}!`
+                : `You lose ${lastBetAmount} chip${lastBetAmount && lastBetAmount > 1 ? "s" : ""}!`}
             </>
           ) : (
             ""
