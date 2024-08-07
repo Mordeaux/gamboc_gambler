@@ -30,6 +30,14 @@ export const getLatestGameState = async (playerId: string) =>
     take: 1,
   });
 
+export const getPreviousGameState = async (playerId: string) => {
+  const history = await getHistory(playerId);
+  const cleanedHistory = history
+    .flatMap((gameState) => gameState)
+    .filter((gameState) => gameState.moveType === MoveType.Bet);
+  return cleanedHistory.slice(-1)[0];
+};
+
 export const processMove = async (
   currentPlayer: User,
   moveType: MoveType,
